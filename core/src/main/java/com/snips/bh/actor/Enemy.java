@@ -1,5 +1,6 @@
 package com.snips.bh.actor;
 
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
@@ -11,6 +12,10 @@ public class Enemy implements Targetable{
     public float speed = 140f;
     public float turnSpeed = 6f;
     public boolean alive = true;
+    public float maxHP = 30f;
+    public float hp = maxHP;
+
+    private final Circle bounds = new Circle();
 
     public Enemy(float x, float y){
         pos.set(x, y);
@@ -25,7 +30,30 @@ public class Enemy implements Targetable{
         desired.nor().scl(speed); //desired velocity
         vel.lerp(desired, turnSpeed * dt);//steer toward desired(smooth)
         pos.mulAdd(vel, dt);
+
+        //check if dead
+        if (hp <= 0f){
+            alive = false;
+        }
     }
+
+    public void damage(float amount){
+        if(!alive){
+            return;
+        }
+        hp -= amount;
+        if(hp <= 0f){
+            hp = 0f;
+            alive = false;
+        }
+    }
+
+    /*
+    public Circle getBounds() {
+        bounds.set(pos.x, pos.y, r);
+        return bounds;
+    }
+    */
 
     public void render(ShapeRenderer sr){
 
@@ -37,4 +65,5 @@ public class Enemy implements Targetable{
     @Override public boolean isAlive(){
         return alive;
     }
+
 }
