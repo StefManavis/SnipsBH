@@ -5,6 +5,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
@@ -18,6 +20,7 @@ import com.snips.bh.actor.Player;
 import com.snips.bh.actor.Weapon;
 
 public class GameMain extends ApplicationAdapter {
+    public static final float TARGET_AR = 20f/9f;// 20:9 aspect ratio for phones
     // Virtual world size
     public static final float WORLD_W = 800f;
     public static final float WORLD_H = 450f;
@@ -26,6 +29,11 @@ public class GameMain extends ApplicationAdapter {
     private Viewport viewport;
     private ShapeRenderer shapes;
     private Player player;
+
+    //SPRITES FOR BACKGROUNDS
+    private SpriteBatch batch;
+    private Texture bg;
+
 
     // ENEMIES
     private final Array<Enemy> enemies = new Array<>();
@@ -48,10 +56,18 @@ public class GameMain extends ApplicationAdapter {
         camera.position.set(WORLD_W * 0.5f, WORLD_H * 0.5f, 0f);
 
         shapes = new ShapeRenderer();
+        batch  = new SpriteBatch();
+
+        //BACKGROUND TEXTURE
+        bg = new Texture(Gdx.files.internal("bg_street.png")); // NEW
+        bg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+
 
         // Start player in the center
         player = new Player(WORLD_W / 2f, WORLD_H / 2f);
     }
+
+
 
     @SuppressWarnings("DuplicatedCode")
     @Override
@@ -200,6 +216,14 @@ public class GameMain extends ApplicationAdapter {
         Gdx.gl.glClearColor(0.08f, 0.08f, 0.1f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        //DRAW BACKGROUND FIRST
+        batch.setProjectionMatrix(camera.combined);
+        batch.begin();
+
+        //stretch to world size so it always fills the viewport
+        batch.draw(bg, 0, 0, WORLD_W, WORLD_H);
+        batch.end();
+
         camera.update();
         shapes.setProjectionMatrix(camera.combined);
 
@@ -245,11 +269,22 @@ public class GameMain extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);
+        viewport.update(width, height, true);;
     }
 
     @Override
     public void dispose() {
         shapes.dispose();
     }
+
+
+
+
+
+
+
+
+
+
+
 }
