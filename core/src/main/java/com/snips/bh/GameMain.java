@@ -35,7 +35,7 @@ public class GameMain extends ApplicationAdapter {
        shapes = new ShapeRenderer();
 
        // start in the center of the current window
-       player = new Player(WORLD_W / 2f, 60f);
+       player = new Player(WORLD_W / 2f, WORLD_H / 2f);
    }
 
    @Override
@@ -53,7 +53,7 @@ public class GameMain extends ApplicationAdapter {
        shapes.setProjectionMatrix(camera.combined);
 
        shapes.begin(ShapeType.Filled);
-       shapes.circle(player.x, player.y, player.r); // player
+       shapes.circle(player.pos.x, player.pos.y, player.r); // player
        shapes.end();
 
        // --- Exit on Shift + Enter ---

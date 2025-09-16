@@ -15,7 +15,7 @@ public class Player {
     //public float margin = 16f;//clamp margin from screen edges
 
 
-    public Player(float x, float y){//Constructor for Player
+    public Player(float x, float y){//Constructor for Player, where player spawns
         this.x = x;
         this.y = y;
     }
@@ -29,7 +29,6 @@ public class Player {
         if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT))  dx -= 1;
         if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) dx += 1;
 
-
         //normalize diagonal
         if(dx != 0 || dy != 0){
             float len = (float)Math.sqrt(dx*dx + dy*dy);
@@ -41,7 +40,7 @@ public class Player {
 
         //clamp inside window
 
-        x = MathUtils.clamp(x, r, worldW - r);
-        y = MathUtils.clamp(y, r, worldH -r);
+        pos.x = MathUtils.clamp(pos.x, r, worldW - r);
+        pos.y = MathUtils.clamp(pos.y, r, worldH -r);
     }
 }
