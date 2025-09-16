@@ -16,8 +16,9 @@ public class GameMain extends ApplicationAdapter {
    @Override
     public void create(){
        shapes = new ShapeRenderer();
+
        // start in the center of the current window
-       player = new Player(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() - 2f);
+       player = new Player(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f);
    }
 
    @Override

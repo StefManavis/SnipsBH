@@ -3,9 +3,11 @@ package com.snips.bh.actor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 public class Player {
-    public float x, y;//Center position in pixels
+    public final Vector2 pos = new Vector2(100, 100);//Vector for position of Player
+    public float x, y;//Center position in pixels   // Probs REMOVE LATER
     public float r = 28f;//radius in pixels
     public float speed = 420f;//pixels/s
     public float margin = 16f;//clamp margin from screen edges
@@ -26,8 +28,8 @@ public class Player {
         //normalize diagonal
         if(dx != 0 || dy != 0){
             float len = (float)Math.sqrt(dx*dx + dy*dy);
-            dx /= len;
-            dy /= len;
+            pos.x += (dx / len) * speed * dt;
+            pos.y += (dy / len) * speed * dt;
         }
 
         x += dx * speed * dt;
