@@ -8,10 +8,11 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.Input;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
-import com.snips.bh.actor.Player;
+import com.snips.bh.actor.*;
 
 
 public class GameMain extends ApplicationAdapter {
@@ -23,6 +24,12 @@ public class GameMain extends ApplicationAdapter {
     private Viewport viewport;
    private ShapeRenderer shapes;
    private Player player;
+
+   //ENEMIES
+   private final Array<Enemy> enemies = new Array<>();
+   private final EnemySpawner spawner = new EnemySpawner();
+
+
 
    @Override
     public void create(){
@@ -62,6 +69,25 @@ public class GameMain extends ApplicationAdapter {
            Gdx.app.exit(); // triggers dispose() safely
        }
 
+
+
+       spawner.updateAndMaybeSpawn(dt, enemies, WORLD_W, WORLD_H);
+
+       for (int i = enemies.size - 1; i >= 0; i--) {
+           Enemy e = enemies.get(i);
+           e.update(dt, player.pos);
+
+           // optional cleanup: if it flies way off (after overshooting)
+           float margin = 200f;
+           if (e.pos.x < -margin || e.pos.x > WORLD_W + margin || e.pos.y < -margin || e.pos.y > WORLD_H + margin) {
+               enemies.removeIndex(i);
+           }
+       }
+
+       // draw (with ShapeRenderer in Filled mode)
+       shapes.begin(ShapeType.Filled);
+       for (Enemy e : enemies) e.render(shapes);
+       shapes.end();
    }
 
    @Override

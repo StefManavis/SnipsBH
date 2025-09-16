@@ -12,7 +12,9 @@ public class Player {
     public float x, y;//Center position in pixels   // PROBABLY REMOVE LATER
     public float r = 14f;//radius in pixels
     public float speed = 420f;//pixels/s
-    //public float margin = 16f;//clamp margin from screen edges
+    //public float margin = 16f;//clamp margin from screen edges //PROBABLY REMOVE LATER
+
+
 
 
     public Player(float x, float y){//Constructor for Player, where player spawns
