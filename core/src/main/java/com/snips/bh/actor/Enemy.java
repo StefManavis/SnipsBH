@@ -3,13 +3,14 @@ package com.snips.bh.actor;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
-public class Enemy {
+public class Enemy implements Targetable{
     public final Vector2 pos = new Vector2();
     private final Vector2 vel = new Vector2();
 
     public float r = 10f;
     public float speed = 140f;
     public float turnSpeed = 6f;
+    public boolean alive = true;
 
     public Enemy(float x, float y){
         pos.set(x, y);
@@ -27,6 +28,13 @@ public class Enemy {
     }
 
     public void render(ShapeRenderer sr){
+
         sr.circle(pos.x, pos.y, r);
+    }
+    @Override public Vector2 getPos(){
+        return pos;
+    }
+    @Override public boolean isAlive(){
+        return alive;
     }
 }
