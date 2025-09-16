@@ -33,6 +33,9 @@ public class GameMain extends ApplicationAdapter {
 
    @Override
     public void create(){
+       //Enable blending to make objects opaque
+       Gdx.gl.glEnable(GL20.GL_BLEND);
+       Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
        //initialize camera/viewport
        camera = new OrthographicCamera();
        viewport = new FitViewport(WORLD_W, WORLD_H, camera);
@@ -45,6 +48,7 @@ public class GameMain extends ApplicationAdapter {
        player = new Player(WORLD_W / 2f, WORLD_H / 2f);
    }
 
+   @SuppressWarnings("DuplicatedCode")
    @Override
     public void render(){
        float dt = Gdx.graphics.getDeltaTime();
@@ -59,9 +63,7 @@ public class GameMain extends ApplicationAdapter {
        camera.update();
        shapes.setProjectionMatrix(camera.combined);
 
-       shapes.begin(ShapeType.Filled);
-       shapes.circle(player.pos.x, player.pos.y, player.r); // player
-       shapes.end();
+
 
        // --- Exit on Shift + Enter ---
        if (Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT) &&
@@ -84,8 +86,90 @@ public class GameMain extends ApplicationAdapter {
            }
        }
 
-       // draw (with ShapeRenderer in Filled mode)
+       // --- COLLISIONS: Enemy vs Player ---
+       for (int i = 0; i < enemies.size; i++) {
+           Enemy e = enemies.get(i);
+
+           float dx = e.pos.x - player.pos.x;
+           float dy = e.pos.y - player.pos.y;
+           float minDist = e.r + player.r;
+           float dist2 = dx*dx + dy*dy;
+
+           if (dist2 > 0f && dist2 < minDist*minDist) {
+               float dist = (float)Math.sqrt(dist2);
+               float overlap = minDist - dist;
+
+               // normal
+               float nx = dx / dist;
+               float ny = dy / dist;
+
+               // Push the ENEMY out so it cannot enter the player
+               e.pos.x += nx * overlap;
+               e.pos.y += ny * overlap;
+
+               // Optional: touch damage with cooldown
+               if (player.touchDamageCooldown <= 0f) {
+                   player.damage(5f);                 // tune this value
+                   player.touchDamageCooldown = 0.4f; // 400 ms i-frames
+               }
+           }
+       }
+
+       // --- COLLISIONS: Enemy vs Enemy ---
+       for (int i = 0; i < enemies.size; i++) {
+           Enemy a = enemies.get(i);
+           for (int j = i + 1; j < enemies.size; j++) {
+               Enemy b = enemies.get(j);
+
+               float dx = b.pos.x - a.pos.x;
+               float dy = b.pos.y - a.pos.y;
+               float minDist = a.r + b.r;
+               float dist2 = dx*dx + dy*dy;
+
+               if (dist2 > 0f && dist2 < minDist*minDist) {
+                   float dist = (float)Math.sqrt(dist2);
+                   float overlap = (minDist - dist);
+
+                   // normal
+                   float nx = dx / dist;
+                   float ny = dy / dist;
+
+                   // equal mass: split the correction 50/50
+                   float half = overlap * 0.5f;
+                   a.pos.x -= nx * half;
+                   a.pos.y -= ny * half;
+                   b.pos.x += nx * half;
+                   b.pos.y += ny * half;
+               }
+           }
+       }
+
+       /* RENDER OBJECTS IN HERE */
+       // draw player
        shapes.begin(ShapeType.Filled);
+       // Player (white)
+       shapes.setColor(1f, 1f, 1f, 1f);
+       shapes.circle(player.pos.x, player.pos.y, player.r);
+
+       // --- HP BAR ---
+      if(player.hasTakenDamage()) {
+          float pct = player.healthPct();
+          float barW = 30f;
+          float barH = 6f;
+          float barX = player.pos.x - barW / 2f;
+          float barY = player.pos.y + player.r + 8f; // a little above the head
+
+          // background (semi-transparent dark)
+          shapes.setColor(0f, 0f, 0f, 0.35f);
+          shapes.rect(barX, barY, barW, barH);
+
+          // fill (semi-transparent green)
+          shapes.setColor(0f, 1f, 0f, 0.7f);
+          shapes.rect(barX, barY, barW * pct, barH);
+      }
+
+       // draw enemies (still in the same begin/end)
+       shapes.setColor(1f, 0f, 0f, 1f); // RED
        for (Enemy e : enemies) e.render(shapes);
        shapes.end();
    }

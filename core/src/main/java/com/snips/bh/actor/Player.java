@@ -9,17 +9,18 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Player {
     public final Vector2 pos = new Vector2(100, 100);//Vector for position of Player
-    public float x, y;//Center position in pixels   // PROBABLY REMOVE LATER
     public float r = 14f;//radius in pixels
     public float speed = 420f;//pixels/s
     //public float margin = 16f;//clamp margin from screen edges //PROBABLY REMOVE LATER
 
+    public float maxHP = 100f;
+    public float hp    = maxHP;
 
+    public float touchDamageCooldown = 0.0f;//So we don't take damage every frame
 
 
     public Player(float x, float y){//Constructor for Player, where player spawns
-        this.x = x;
-        this.y = y;
+        pos.set(x, y);
     }
 
     public void update(float dt, float worldW, float worldH){
@@ -38,11 +39,32 @@ public class Player {
             pos.y += (dy / len) * speed * dt;
         }
 
-
-
         //clamp inside window
-
         pos.x = MathUtils.clamp(pos.x, r, worldW - r);
         pos.y = MathUtils.clamp(pos.y, r, worldH -r);
+
+        if (touchDamageCooldown > 0f) {
+            touchDamageCooldown -= dt;
+         }
     }
+
+    //HELPER hasTakenDamage
+    public boolean hasTakenDamage() {
+        return hp < maxHP;
+    }
+
+    public void damage(float amount) {
+        hp = MathUtils.clamp(hp - amount, 0f, maxHP);
+    }
+
+    public void heal(float amount)   {
+        hp = MathUtils.clamp(hp + amount, 0f, maxHP);
+    }
+    public float healthPct(){
+        return hp / maxHP;
+    }
+    public boolean isDead() {
+        return hp <= 0f;
+    }
+
 }

@@ -28,7 +28,6 @@ public class Enemy {
     }
 
     public void render(ShapeRenderer sr){
-        sr.setColor(Color.RED);
         sr.circle(pos.x, pos.y, r);
     }
 }
