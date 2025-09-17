@@ -20,10 +20,11 @@ import com.snips.bh.actor.Player;
 import com.snips.bh.actor.Weapon;
 
 public class GameMain extends ApplicationAdapter {
-    public static final float TARGET_AR = 20f/9f;// 20:9 aspect ratio for phones
+    //public static final float TARGET_AR = 9f/20f;// 20:9 aspect ratio for phones
     // Virtual world size
-    public static final float WORLD_W = 800f;
-    public static final float WORLD_H = 450f;
+    public static final float WORLD_H = 1000f;
+
+    public static final float WORLD_W = 450f;
 
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -33,6 +34,7 @@ public class GameMain extends ApplicationAdapter {
     //SPRITES FOR BACKGROUNDS
     private SpriteBatch batch;
     private Texture bg;
+    private Texture soldier;
 
 
     // ENEMIES
@@ -59,9 +61,10 @@ public class GameMain extends ApplicationAdapter {
         batch  = new SpriteBatch();
 
         //BACKGROUND TEXTURE
-        bg = new Texture(Gdx.files.internal("bg_street.png")); // NEW
+        bg = new Texture(Gdx.files.internal("bg_street.png"));
         bg.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-
+        soldier = new Texture(Gdx.files.internal("soldier.png"));
+        soldier.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
 
         // Start player in the center
         player = new Player(WORLD_W / 2f, WORLD_H / 2f);
@@ -230,9 +233,34 @@ public class GameMain extends ApplicationAdapter {
         // --- RENDER ---
         shapes.begin(ShapeType.Filled);
 
-        // Player (white)
-        shapes.setColor(1f, 1f, 1f, 1f);
-        shapes.circle(player.pos.x, player.pos.y, player.r);
+        // Player (sprite)
+        batch.begin();
+
+// angle to the closest enemy (fallback 0 if none)
+        float angleDeg = 0f;
+        if (enemies.size > 0) {
+            Enemy target = enemies.first(); // or your auto-aim choice
+            float dx = target.pos.x - player.pos.x;
+            float dy = target.pos.y - player.pos.y;
+            angleDeg = (float)Math.toDegrees(Math.atan2(dy, dx)) - 90f; // sprite faces up
+        }
+
+// draw centered and rotated to player.r size
+        float scale = 1.7f;
+        float size = player.r * 2f * scale;     // match previous diameter
+        batch.draw(
+            soldier,
+            player.pos.x - player.r,     // x
+            player.pos.y - player.r,     // y
+            player.r, player.r,          // origin (center for rotation)
+            size, size,                  // width/height
+            1f, 1f,                      // scale
+            angleDeg,                    // rotation in degrees
+            0, 0,                        // srcX, srcY
+            soldier.getWidth(), soldier.getHeight(),
+            false, false                 // flipX/Y
+        );
+        batch.end();
 
         // Player HP bar (only after taking damage)
         if (player.hasTakenDamage()) {
@@ -269,12 +297,15 @@ public class GameMain extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height, true);;
+        viewport.update(width, height, true);
     }
 
     @Override
     public void dispose() {
         shapes.dispose();
+        batch.dispose();
+        bg.dispose();
+        soldier.dispose();
     }
 
 

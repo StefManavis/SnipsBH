@@ -10,7 +10,7 @@ import com.badlogic.gdx.math.Vector2;
 public class Player {
     public final Vector2 pos = new Vector2(100, 100);//Vector for position of Player
     public float r = 14f;//radius in pixels
-    public float speed = 420f;//pixels/s
+    public float speed = 200f;//pixels/s
     //public float margin = 16f;//clamp margin from screen edges //PROBABLY REMOVE LATER
 
     public float maxHP = 100f;
