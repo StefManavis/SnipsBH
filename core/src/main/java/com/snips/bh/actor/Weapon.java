@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 
+@SuppressWarnings("ALL")
 public class Weapon {
     // --- Config ---
     private float shotsPerSecond = 6f;
