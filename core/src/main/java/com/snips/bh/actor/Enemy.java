@@ -1,69 +1,84 @@
 package com.snips.bh.actor;
 
-import com.badlogic.gdx.math.Circle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.MathUtils;
 
-public class Enemy implements Targetable{
+public class Enemy implements Targetable {
     public final Vector2 pos = new Vector2();
-    private final Vector2 vel = new Vector2();
-
-    public float r = 10f;
+    public float r = 14f;
     public float speed = 140f;
-    public float turnSpeed = 6f;
-    public boolean alive = true;
     public float maxHP = 30f;
-    public float hp = maxHP;
+    public float hp    = maxHP;
+    private boolean alive = true;
+    private float angleDeg = 0f;
+    private Texture sprite;
 
-    private final Circle bounds = new Circle();
 
-    public Enemy(float x, float y){
+    public Enemy(float x, float y, Texture tex) {
         pos.set(x, y);
+        this.sprite = tex;
     }
 
-    //Smooth homing, velocity steers toward player without snapping
-    public void update(float dt, Vector2 playerPos){
-        //desired direction toward player
-        Vector2 desired = new Vector2(playerPos).sub(pos);
-        if(desired.isZero()) return;
-
-        desired.nor().scl(speed); //desired velocity
-        vel.lerp(desired, turnSpeed * dt);//steer toward desired(smooth)
-        pos.mulAdd(vel, dt);
-
-        //check if dead
-        if (hp <= 0f){
-            alive = false;
+    public void update(float dt, Vector2 targetPos) {
+        // simple chase
+        float dx = targetPos.x - pos.x;
+        float dy = targetPos.y - pos.y;
+        float len = (float)Math.sqrt(dx*dx + dy*dy);
+        if (len > 1e-4f) {
+            pos.x += (dx / len) * speed * dt;
+            pos.y += (dy / len) * speed * dt;
         }
     }
-
-    public void damage(float amount){
-        if(!alive){
-            return;
-        }
-        hp -= amount;
-        if(hp <= 0f){
-            hp = 0f;
-            alive = false;
-        }
+    public void faceToward(Vector2 target) {
+        float dx = target.x - pos.x;
+        float dy = target.y - pos.y;
+        angleDeg = (float)Math.toDegrees(Math.atan2(dy, dx)) - 90f;
     }
 
-    /*
-    public Circle getBounds() {
-        bounds.set(pos.x, pos.y, r);
-        return bounds;
-    }
-    */
-
-    public void render(ShapeRenderer sr){
-
-        sr.circle(pos.x, pos.y, r);
-    }
-    @Override public Vector2 getPos(){
-        return pos;
-    }
-    @Override public boolean isAlive(){
-        return alive;
+    public void damage(float d) {
+        hp = MathUtils.clamp(hp - d, 0f, 1000f);
+        if (hp <= 0f) alive = false;
     }
 
+    public boolean isAlive() { return alive; }
+
+    @Override
+    public Vector2 getPos() { return pos; }
+    public boolean hasTakenDamage()  { return hp < maxHP; }
+    public float healthPct()         { return hp / maxHP; }
+
+    public void render(SpriteBatch batch) {
+        float size = r * 2f * 1.7f;
+        float originX = size * 0.5f;
+        float originY = size * 0.55f;
+        batch.draw(
+            sprite,
+            pos.x - originX, pos.y - originY,
+            originX, originY,
+            size, size,
+            1f, 1f,
+            0f, // enemies don’t rotate yet
+            0, 0,
+            sprite.getWidth(), sprite.getHeight(),
+            false, false
+        );
+    }
+
+    public void renderHpBar(ShapeRenderer shapes) {
+        if (!hasTakenDamage()) return;
+        float pct = healthPct();
+        float barW = 30f;
+        float barH = 6f;
+        float barX = pos.x - barW / 2f;
+        float barY = pos.y + r + 8f;
+
+        shapes.setColor(0f, 0f, 0f, 0.35f);
+        shapes.rect(barX, barY, barW, barH);
+
+        shapes.setColor(0f, 1f, 0f, 0.7f);
+        shapes.rect(barX, barY, barW * pct, barH);
+    }
 }
