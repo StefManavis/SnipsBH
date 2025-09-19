@@ -78,9 +78,8 @@ public class PlayScreen extends ScreenAdapter {
     @Override
     public void render(float dt) {
         // ---- UPDATE ----
-        // Simple pause-to-menu with ESC (optional)
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-            game.setScreen(new MenuScreen(game));
+            game.setScreen(new PauseScreen(game, this));
             return;
         }
 
@@ -169,6 +168,7 @@ public class PlayScreen extends ScreenAdapter {
         // Background
         batch.begin();
         batch.draw(bg, 0, 0, WORLD_W, WORLD_H);
+
         // Player & enemies
         player.render(batch);
         for (Enemy e : enemies) e.render(batch);
@@ -177,6 +177,7 @@ public class PlayScreen extends ScreenAdapter {
         // HP bars + bullets (ShapeRenderer)
         shapes.begin(ShapeRenderer.ShapeType.Filled);
         player.renderHpBar(shapes);
+        player.renderXpBar(shapes, WORLD_W, WORLD_H);
         for (Enemy e : enemies) e.renderHpBar(shapes);
         for (Bullet b : bullets) b.render(shapes);
         shapes.end();

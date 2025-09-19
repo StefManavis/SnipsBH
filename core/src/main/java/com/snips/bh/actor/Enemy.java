@@ -10,11 +10,12 @@ public class Enemy implements Targetable {
     public final Vector2 pos = new Vector2();
     public float r = 14f;
     public float speed = 140f;
-    public float maxHP = 300f;
+    public float maxHP = 30f;
     public float hp    = maxHP;
     private boolean alive = true;
     private float angleDeg = 0f;
     private final Texture sprite;
+    private float XPValue = 200f; // XP granted to player upon defeat
 
 
     public Enemy(float x, float y, Texture tex) {
@@ -40,7 +41,10 @@ public class Enemy implements Targetable {
 
     public void damage(float d) {
         hp = MathUtils.clamp(hp - d, 0f, 1000f);
-        if (hp <= 0f) alive = false;
+        if (hp <= 0f) {
+            alive = false;
+            Player.XP += XPValue;
+        }
     }
 
     public boolean isAlive() { return alive; }

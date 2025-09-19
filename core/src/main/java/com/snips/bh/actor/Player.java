@@ -17,6 +17,13 @@ public class Player implements Targetable {
     public float hp    = maxHP;
     public float touchDamageCooldown = 0f;
 
+    public static float XP = 0f;
+    public static final int   MAX_LEVEL = 10;
+    public static final float BASE_XP   = 1000f;
+    public static final float GROWTH    = 1.2f;;
+    public int currLevel = 1;
+
+
     private Texture sprite;
     private float angleDeg = 0f;
 
@@ -85,10 +92,42 @@ public class Player implements Targetable {
         shapes.rect(barX, barY, barW * pct, barH);
     }
 
+    // Draw a purple XP bar (HUD, top-left in world coords)
+    public void renderXpBar(ShapeRenderer shapes, float worldW, float worldH) {
+        float pad = 12f;
+        float w   = 220f;
+        float h   = 10f;
+        float x   = pad;
+        float y   = worldH - pad - h;
+
+        // background
+        shapes.setColor(0f, 0f, 0f, 0.5f);
+        shapes.rect(x, y, w, h);
+
+        // fill (purple)
+        float pct = xpProgress();
+        shapes.setColor(0.55f, 0.25f, 0.85f, 1f);
+        shapes.rect(x, y, w * pct, h);
+    }
+
     public void damage(float amount) { hp = MathUtils.clamp(hp - amount, 0f, maxHP); }
     public void heal(float amount)   { hp = MathUtils.clamp(hp + amount, 0f, maxHP); }
     public boolean hasTakenDamage()  { return hp < maxHP; }
     public float healthPct()         { return hp / maxHP; }
+
+    public static float xpToNextLevel(int level) {
+        if (level >= MAX_LEVEL) return Float.POSITIVE_INFINITY; // already at max
+        if (level < 1) level = 1;
+        return BASE_XP * (float)Math.pow(GROWTH, level - 1);
+    }
+    // 0..1 progress for the current level using global XP and currLevel
+    public float xpProgress() {
+        float need = xpToNextLevel(currLevel);
+        if (!Float.isFinite(need) || need <= 0f) return 1f;
+        return MathUtils.clamp(XP / need, 0f, 1f);
+    }
+
+
 
     @Override public Vector2 getPos() { return pos; }
     @Override public boolean isAlive() { return hp > 0f; }
