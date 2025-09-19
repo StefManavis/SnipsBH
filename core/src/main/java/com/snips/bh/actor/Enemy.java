@@ -10,11 +10,11 @@ public class Enemy implements Targetable {
     public final Vector2 pos = new Vector2();
     public float r = 14f;
     public float speed = 140f;
-    public float maxHP = 30f;
+    public float maxHP = 300f;
     public float hp    = maxHP;
     private boolean alive = true;
     private float angleDeg = 0f;
-    private Texture sprite;
+    private final Texture sprite;
 
 
     public Enemy(float x, float y, Texture tex) {
@@ -35,7 +35,7 @@ public class Enemy implements Targetable {
     public void faceToward(Vector2 target) {
         float dx = target.x - pos.x;
         float dy = target.y - pos.y;
-        angleDeg = (float)Math.toDegrees(Math.atan2(dy, dx)) - 90f;
+        angleDeg = (float)Math.toDegrees(Math.atan2(dy, dx)) + 90f;
     }
 
     public void damage(float d) {
@@ -51,7 +51,7 @@ public class Enemy implements Targetable {
     public float healthPct()         { return hp / maxHP; }
 
     public void render(SpriteBatch batch) {
-        float size = r * 2f * 1.7f;
+        float size = r * 2f * 1.2f;
         float originX = size * 0.5f;
         float originY = size * 0.55f;
         batch.draw(
@@ -60,7 +60,7 @@ public class Enemy implements Targetable {
             originX, originY,
             size, size,
             1f, 1f,
-            0f, // enemies don’t rotate yet
+            angleDeg, // enemies don’t rotate yet
             0, 0,
             sprite.getWidth(), sprite.getHeight(),
             false, false
