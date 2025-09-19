@@ -1,37 +1,13 @@
-package com.snips.bh.lwjgl3;
-
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.snips.bh.GameMain;
+import com.snips.bh.SnipsBHGame;
 
-/** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
-    public static void main(String[] args) {
-        if (StartupHelper.startNewJvmIfRequired()) return; // This handles macOS support and helps on Windows.
-        createApplication();
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    private static Lwjgl3Application createApplication() {
-        return new Lwjgl3Application(new GameMain(), getDefaultConfiguration());
-    }
-
-    private static Lwjgl3ApplicationConfiguration getDefaultConfiguration() {
-        Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
-        configuration.setTitle("SnipsBulletHell");
-
-        // Vsync and FPS limiting
-        configuration.useVsync(true);
-        configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
-
-        // Fullscreen at current monitor's native mode
-        Graphics.DisplayMode displayMode = Lwjgl3ApplicationConfiguration.getDisplayMode();
-        configuration.setFullscreenMode(displayMode);
-
-        // Window icons (unchanged)
-        configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
-
-        return configuration;
+    public static void main (String[] args) {
+        Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
+        cfg.setTitle("SnipsBH");
+        cfg.setWindowedMode(1280, 720);
+        cfg.useVsync(true);
+        new Lwjgl3Application(new SnipsBHGame(), cfg);
     }
 }
